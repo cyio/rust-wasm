@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebAssembly Image Processor</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+        canvas { border: 1px solid #000; }
+        button { margin: 10px; }
+    </style>
+</head>
+<body>
+    <h1>WebAssembly Image Processor</h1>
+    <canvas id="canvas" width="400" height="300"></canvas>
+    <br>
+    <button id="increaseBrightness">Increase Brightness</button>
+
+    <script type="module">
+        import init, { increase_brightness } from './pkg/wasm_image_processor.js';
+
+        async function run() {
+            await init();
+
+            const canvas = document.getElementById('canvas');
+            const ctx = canvas.getContext('2d');
+
+            // Create a gray background
+            ctx.fillStyle = 'gray';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            document.getElementById('increaseBrightness').addEventListener('click', () => {
+                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                // imageData.data 是一个 Uint8ClampedArray，它直接指向了包含像素数据的内存缓冲区
+                increase_brightness(imageData.data, canvas.width, canvas.height, 20);
+                ctx.putImageData(imageData, 0, 0);
+            });
+        }
+
+        run();
+    </script>
+</body>
+</html>
